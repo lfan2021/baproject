@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Predition Page</title>
+    <!-- Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Modernize Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template,
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony Ericsson, Motorola web design" />
+    <script>
+        addEventListener("load", function () {
+            setTimeout(hideURLbar, 0);
+        }, false);
+
+        function hideURLbar() {
+            window.scrollTo(0, 1);
+        }
+    </script>
+	
+	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/xlsx/0.11.5/xlsx.core.min.js"></script>
+    <!-- //Meta Tags -->
+
+    <!-- Style-sheets -->
+    <!-- Bootstrap Css -->
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+    <!-- Bootstrap Css -->
+    <!-- Common Css -->
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all" />
+    <!--// Common Css -->
+    <!-- Fontawesome Css -->
+    <link href="css/fontawesome-all.css" rel="stylesheet">
+    <!--// Fontawesome Css -->
+    <!--// Style-sheets -->
+
+    <!--web-fonts-->
+    <link href="//fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    <!--//web-fonts-->
+	
+	
+<style type="text/css">
+body{ background:none;}  
+.p_show{ border-collapse:collapse; }  
+.p_show td{ border:1px solid #ccc; text-align:center; padding-left:10px; padding-right:10px; white-space:nowrap;height:26px; line-height:26px; }  
+.p_show th{background-color:#e1e1e1; border:1px solid #ccc; text-align:center; padding-left:10px; padding-right:10px; white-space:nowrap;height:26px; line-height:26px; }  
+.systext1{width:208px; height:28px; line-height:28px; float:center; border:1px solid #ccc; }  
+.file-box{ position:relative;width:640px}  
+.uploadbtn{ height:28px;  width:60px; margin-left:3px; float:center;  }  
+.but { width:102px; height:28px; line-height:24px; margin-bottom: 3px; border:0px; background:rgba(108,76,203,1.00);  color: #fff; cursor:pointer; }  
+.fileup{ position:absolute; top:0px; left:0px; height:28px; filter:alpha(opacity:0);opacity: 0;width:310px; line-height:28px; } 
+	
+input.file{
+	vertical-align:middle;
+    position:relative;
+    left:-218px;
+    filter:alpha(opacity=0);
+    opacity:0;
+	z-index:1;
+	*width:223px;
+}
+ 
+form input.viewfile {
+	z-index:99;
+	border:1px solid #ccc;
+	padding:2px;
+	width:150px;
+	vertical-align:middle;
+	color:#999;
+}
+ 
+form p span {
+	float:center;
+}
+	 
+</style>
+	
+
+<script type="text/javascript">  
+  function ReadExcel() {  
+       var tempStr = "";  
+       //IE8出于安全性的考虑，上传文件时屏蔽了真实的本地文件路径，而以“C:\fakepath\”取代之。  
+       //用下面的方法获取文件的路径（只对IE有效）  
+       var file_upl = document.getElementById("upfile");  
+       file_upl.select();  
+       var filePath = document.selection.createRange().text;  
+       document.getElementById("viewfile").value=filePath;//文本框显示文件路径  
+  
+       if(isempty(filePath)){return ;}//若为空，不处理  
+       try {    
+               var oXL = new ActiveXObject("Excel.Application"); //创建操作EXCEL应用程序的实例    
+           }catch(e) {    
+            alert( "要将该表导出到Excel，您必须安装Excel电子表格软件，同时浏览器须使用“ActiveX 控件”，您的浏览器须允许执行控件。");    
+                return "";    
+           }    
+         
+       var oWB = oXL.Workbooks.open(filePath);//打开指定路径的excel文件  
+       var count = oWB.worksheets.Count;//sheet的张数  
+       var str="";  
+	   var data=[];
+       for(var c=1;c<=count;c++){//循环每一张sheet  
+           var name =oWB.worksheets(c).name;//每个sheet的名称  
+           oWB.worksheets(c).select();//选定要操作的sheet  
+           var oSheet = oWB.ActiveSheet;  
+           var rows = oSheet.usedrange.rows.count; //行数  
+           var columns =oSheet.usedrange.columns.count ;//列数  
+           str+="<center><h3>"+name+"</h3></center>"  
+           str+="<table  border='0' cellspacing='0' cellpadding='0' class='p_show' width='100%'>";  
+           for(var i=1;i<=rows;i++){  
+            str +="<tr>";  
+                if(i==1){   //第一行是th，标题  
+                    for(var j=1;j<=columns;j++){  
+                    //Excel中每一个sheet默认有36列，但并不是每一列都有数据，获取第一行的数据，判断当没有数据时就不再循环并记录columns，下面的数据只需要循环columns列而不再是36列  
+                        if(isempty(oSheet.cells(i,j).value)){  
+                            columns=j-1;  
+                            break;  
+                        }else{  
+                            str+="<th>"+oSheet.cells(i,j).value+"</th>";  
+                        }  
+                    }  
+                }else{  
+					if(!data[i]){
+                            data[i] = new Array();
+                        }
+                    for(var k=1;k<=columns;k++){  
+                        str+="<td>"+setValue(oSheet.cells(i,k).value)+"</td>";  
+						//var r=i+1;
+						data[i][k]=oSheet.cells(i,k).value;
+						//console.log("每行数据：",data[i][k]);
+                    }  
+                }  
+           str +="</tr>";  
+           }  
+           str+="</table>";  
+        }  
+        document.getElementById("show").innerHTML=str; 
+         //oWB.close();  
+         //退出操作excel的实例对象  
+            //oXL.quit();  
+        //oXL.Visible = true; //设置excel为可见    
+        //很重要,不能省略,不然会出问题 意思是excel交由用户控制         
+        oXL.UserControl = true;      
+        oSheet = null;    
+        oWB = null;    
+        oXL = null;    
+       //手动调用垃圾收集器  
+       CollectGarbage();  
+	   //document.getElementById("demo").innerHTML=data;
+	   console.log("你输入的表格数据为",data);
+	  
+	   return data;
+  }  
+  
+//设置值，若为空，则用&nbsp;代替  
+function setValue(_value){  
+        //处理日期格式的数据：从Excel中获取的日期数据用JS读取出来之后会变成字符串，也就是这种类型：Tue Jul 16 01:07:00 CST 2013，转换成这种类型：yyyy-mm-ddd  
+    if((_value+" ").indexOf("UTC")!=-1){  
+        var vDate = new Date(_value);  
+        _value=(vDate.getFullYear())+"-"+(vDate.getMonth()+1)+"-"+(vDate.getDate());//getDay()获取当前星期X(0-6,0代表星期天)  
+        return _value;  
+    }else{  
+        return isempty(_value)?"&nbsp;":_value;  
+    }  
+  }  
+  /** 
+*验证js变量的值是否为空， 
+* true-不存在 
+* false-存在 
+*  
+*/  
+function isempty(v){   
+    switch (typeof v){   
+        case 'undefined' : return true;  
+        case 'string' : if((v.replace(/(^\s*)|(\s*$)/, "")).length == 0) return true; break;   
+        case 'boolean' : if(!v) return true; break;   
+        case 'number' : if(0 === v) return true; break;   
+        case 'object' :   
+        if(null === v) return true;   
+        if(undefined !== v.length && v.length==0) return true;   
+        for(var k in v){return false;} return true;   
+        break;   
+    }   
+return false;   
+} 
+</script>
+	
+<script type="text/javascript"> 
+		
+//计算模型
+function compute(){
+	//var data = new  Array([],[]);
+	var data= ReadExcel();
+	console.log("表格数据为",data);
+	var age_brain=0.0;  //结果存放
+	//计算模型的参数赋予数组
+	//female paramater
+	var model1=[-0.055985859,-0.03341102,0.051322977,-0.11237517,0.055597833,0.118487368,0.220820395,0.065523272,0.010318681,0.003875603,-0.074933538,-0.054538527,-0.032596569,0.058232036,0.115168995,0.147403592,-0.095495409,-0.025577075,-0.086800476,-0.00584663,-0.170513811,-0.034275721,0.166912769,-0.091125065,0.026720609,0.139511559,-0.112501613,-0.032340167,-0.150164013,0.026744841,-0.148849476,0.029024779,-0.046777202,-0.040877633,-0.128470118,0.051817881,-0.165648033,0.091787276,-0.051970604,-0.14025526,0.293761689,0.122280388,0.020318238,0.010102833,-0.010795154,-0.0519764,0.010483584,0.079815454,0.019149093,0.028875903,0.099016774,-0.000352749,-0.136586247,0.030279136,0.18415427,-0.09634482,0.048466337,-0.126301051,-0.041805898,0.215969019,0.118978693,-0.079634938,0.055048664,-0.169059582,-0.014247776,0.022992959,-0.02752246,-0.006403574,19.29260489]
+	//male paramater
+	var model2=[0.087121233,0.040929788,0.036077417,0.068272212,0.040466856,0.420838556,-0.15231242,0.05672989,-0.08064827,0.093253572,-0.290906672,-0.010237234,-0.181188137,-0.070822672,0.015724174,0.006453845,-0.049158325,0.188130974,0.10096672,0.085929813,-0.058229588,-0.026432851,-0.052725558,-0.188081052,0.11050997,0.484080145,-0.100316831,0.384901702,-0.057464953,0.225563156,0.146654598,-0.006799958,0.063505163,-0.080770155,-0.105929994,0.004704551,-0.02854646,-0.178300562,-0.025596635,-0.056505196,-0.065633269,0.152351208,0.079694679,0.166065114,0.099398038,-0.064504309,0.141489154,0.022681596,0.007809088,-0.004572413,-0.170386031,-0.196052817,-0.094386257,0.180432408,-0.041127037,-0.14644965,0.090834244,-0.023468642,-0.089510342,-0.166180041,0.101546378,-0.073694788,0.164839123,-0.188434174,0.155928821,-0.084115043,-0.24630918,0.051570816,19.69263919]
+	var rows1=data.length; 
+	console.log("表格行数",rows1);
+	var cells=69;
+	var std_female = 0.6968 * 1.96;
+	var std_male = 0.7334 * 1.96;
+	for(var i=1;i<rows1-1; i++){
+		r= i+1;
+        //for(var j=0; j<cells; j++){
+		    if(data[r][2]=="1"){
+				var age_chro=data[r][3];
+				//计算脑龄
+				age_brain= model1[0] * data[r][4]+model1[1] * data[r][5]+model1[2]*data[r][6]+model1[3] * data[r][7]+model1[4] * data[r][8]+model1[5]*data[r][9]+model1[6] * data[r][10]+model1[7] * data[r][11]+model1[8]*data[r][12]+model1[9] * data[r][13]+model1[10] * data[r][14]+model1[11]*data[r][15]+model1[12] * data[r][16]+model1[13] * data[r][17]+model1[14]*data[r][18]+model1[15] * data[r][19]+model1[16] * data[r][20]+model1[17]*data[r][21]+model1[18] * data[r][22]+model1[19] * data[r][23]+model1[20]*data[r][24]+model1[21] * data[r][25]+model1[22] * data[r][26]+model1[23]*data[r][27] +model1[24] * data[r][28]+model1[25] * data[r][29]+model1[26]*data[r][30]+model1[27] * data[r][31]+model1[28] * data[r][32]+model1[29]*data[r][33]+model1[30] * data[r][34]+model1[31] * data[r][35]+model1[32]*data[r][36]+model1[33] * data[r][37]+model1[34] * data[r][38]+model1[35]*data[r][39]+model1[36] * data[r][40]+model1[37] * data[r][41]+model1[38]*data[r][42]+model1[39] * data[r][43]+model1[40] * data[r][44]+model1[41]*data[r][45]+model1[42] * data[r][46]+model1[43] * data[r][47]+model1[44]*data[r][48]+model1[45] * data[r][49]+model1[46] * data[r][50]+model1[47]*data[r][51]+model1[48]*data[r][52]+model1[49] * data[r][53]+model1[50] * data[r][54]+model1[51]*data[r][55]+model1[52] * data[r][56]+model1[53] * data[r][57]+model1[54]*  data[r][58]+model1[55] * data[r][59]+model1[56] * data[r][60]+model1[57]*  data[r][61]+model1[58] * data[r][62]+model1[59]*  data[r][63]+model1[60] * data[r][64]+model1[61] * data[r][65]+model1[62]*data[r][66]+model1[63] * data[r][67]+model1[64] * data[r][68]+model1[65]*data[r][69]+model1[66] * data[r][70]+model1[67] * data[r][71] +model1[68];
+				
+				var age_sub = age_chro-age_brain; //计算脑龄差
+				//保留一位小数点
+				var age_sub = age_sub.toFixed(1);
+				var age_brain = age_brain.toFixed(1);
+				//显示脑龄差
+				document.write(data[r][1],"你的脑龄为：",age_brain,"岁");
+		        document.write("<br />");
+				document.write("你的脑龄差为：",age_sub)
+				document.write("<br />");
+				//判断脑龄差是否在合理范围内
+				if(age_sub>=-std_female && age_sub<=std_female){
+					document.write("你的脑发育正常！");
+				}
+				else{
+					document.write("你的脑发育延缓！");
+				}
+				document.write("<br />");
+				document.write("<img src='images/female.png' height='300' weight='600' alt='' />"); 
+				    
+			} 
+		    else{
+				//for(var j=0; j<cells; j++){
+				    //res += model2[j] * data2[r][j+4];
+				var age_chro=data[r][3];//生理年龄
+				age_brain= model2[0] * data[r][4]+model2[1] * data[r][5]+model2[2]*data[r][6]+model2[3] * data[r][7]+model2[4] * data[r][8]+model2[5]*data[r][9]+model2[6] * data[r][10]+model2[7] * data[r][11]+model2[8]*data[r][12]+model2[9] * data[r][13]+model2[10] * data[r][14]+model2[11]*data[r][15]+model2[12] * data[r][16]+model2[13] * data[r][17]+model2[14]*data[r][18]+model2[15] * data[r][19]+model2[16] * data[r][20]+model2[17]*data[r][21]+model2[18] * data[r][22]+model2[19] * data[r][23]+model2[20]*data[r][24]+model2[21] * data[r][25]+model2[22] * data[r][26]+model2[23]*data[r][27] +model2[24] * data[r][28]+model2[25] * data[r][29]+model2[26]*data[r][30]+model2[27] * data[r][31]+model2[28] * data[r][32]+model2[29]*data[r][33]+model2[30] * data[r][34]+model2[31] * data[r][35]+model2[32]*data[r][36]+model2[33] * data[r][37]+model2[34] * data[r][38]+model2[35]*data[r][39]+model2[36] * data[r][40]+model2[37] * data[r][41]+model2[38]*data[r][42]+model2[39] * data[r][43]+model2[40] * data[r][44]+model2[41]*data[r][45]+model2[42] * data[r][46]+model2[43] * data[r][47]+model2[44]*data[r][48]+model2[45] * data[r][49]+model2[46] * data[r][50]+model2[47]*data[r][51]+model2[48]*data[r][52]+model2[49] * data[r][53]+model2[50] * data[r][54]+model2[51]*data[r][55]+model2[52] * data[r][56]+model2[53] * data[r][57]+model2[54]*  data[r][58]+model2[55] * data[r][59]+model2[56] * data[r][60]+model2[57]*  data[r][61]+model2[58] * data[r][62]+model2[59]*  data[r][63]+model2[60] * data[r][64]+model2[61] * data[r][65]+model2[62]*data[r][66]+model2[63] * data[r][67]+model2[64] * data[r][68]+model2[65]*data[r][69]+model2[66] * data[r][70]+model2[67] * data[r][71] +model2[68];
+				//}
+				//res+=model2[68];
+				//document.write(data[r][1],"你的脑龄为：",res,"岁")
+				
+				var age_sub = age_chro-age_brain; //计算脑龄差
+				//保留一位小数点
+				var age_sub = age_sub.toFixed(1);
+				var age_brain = age_brain.toFixed(1);
+				document.write(data[r][1],"你的脑龄为：",age_brain,"岁");
+		        document.write("<br />");
+				document.write("你的脑龄差为：",age_sub)
+				document.write("<br />");
+				//判断脑龄差是否在合理范围内
+				if(age_sub>=-std_male && age_sub<=std_male){
+					document.write("你的脑发育正常！");
+				}
+				else{
+					document.write("你的脑发育延缓！");
+				}
+				document.write("<br />");
+				document.write("<img src='images/male.png' height='300' weight='600' alt='' />"); 
+			}
+			document.write("<br />");
+	}
+
+}
+</script>
+	
+<script>  
+	function   smt(){  
+		path   =   prompt("文件上传成功！"); 
+	}   
+	</script>
+	
+</head>
+
+<body>
+    <div class="bg-page py-5">
+        <div class="container">
+            <!-- main-heading -->
+            <h2 class="main-title-w3layouts mb-2 text-center text-white">脑龄预测</h2>
+            <!--// main-heading -->
+            <div class="form-body-w3-agile text-center w-lg-50 w-sm-75 w-100 mx-auto mt-5">
+                <form action="#" method="post">
+					<div class="form-group">
+                        <label>请上传数据文件，格式：excel，然后点击预测，即可得到脑龄的预测分析结果</label>
+						<!--<br />
+						<br />-->
+                        <!--<input type="email" class="form-control" placeholder="Enter email" required="">-->
+                    </div>
+                    <!--<label for="viewfile" >上传文件：</label>-->
+                    <div class="form-group">    
+					<label >上传文件：</label>
+                    <input type="text" name="viewfile" id="viewfile" class="systext1" size="80" /> <!--文本框-->   
+                    <input type="button" class="but uploadbtn" value="选择文件" /><!--浏览按钮-->  
+                    <input type="file" class="fileup" size="28" accept=".xls,xlsx" onchange="ReadExcel();" id="upfile"/>
+                    </div>  
+					<div class="form-group">
+					<input type="button" class="btn btn-primary error-w3l-btn mt-sm-5 mt-3 px-4" id="result1" value="预测" onclick="compute();"/>
+                    </div> 
+					
+					<!--<button type="submit" class="btn btn-primary error-w3l-btn mt-sm-5 mt-3 px-4">Login</button>-->
+                </form>
+	
+          <!-- <form name="form2" >
+	       <input type="button" class="btn btn-primary error-w3l-btn mt-sm-5 mt-3 px-4" id="result1" value="预测" onclick="compute();"/>
+           </form>-->
+	
+
+           <div id="show"></div> 
+				<p id="demo"></p>
+                
+                <h1 class="paragraph-agileits-w3layouts mt-2">
+					<br />
+                    <a href="index.html">返回首页</a>
+                </h1>
+            </div>
+
+            <!-- Copyright -->
+            <div class="copyright-w3layouts py-xl-3 py-2 mt-xl-5 mt-4 text-center">
+                <p>© 2021 BAP . 版权所有 .
+                   <!-- <a href="http://www.qiujlab.com/"> fl </a>-->
+                </p>
+            </div>
+            <!--// Copyright -->
+        </div>
+    </div>
+
+
+    <!-- Required common Js -->
+    <script src="js/jquery-2.2.3.min.js"></script>
+    <!-- //Required common Js -->
+
+    <!-- Js for bootstrap working-->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- //Js for bootstrap working -->
+
+</body>
+
+</html>
